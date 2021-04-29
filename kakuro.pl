@@ -12,3 +12,9 @@ combinacoes_soma(N, Els, Soma, Combs) :-
 		),
 		Combs
 	).
+
+permutacoes_soma(N, Els, Soma, Perms) :-
+	combinacoes_soma(N, Els, Soma, Combs),
+	setof(P, (maplist(permutation, Combs, P)), Unmerged),
+	append(Unmerged, WithDuplicates),
+	list_to_set(WithDuplicates, Perms).
