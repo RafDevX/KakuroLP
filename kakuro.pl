@@ -18,3 +18,9 @@ permutacoes_soma(N, Els, Soma, Perms) :-
 	setof(P, (maplist(permutation, Combs, P)), Unmerged),
 	append(Unmerged, WithDuplicates),
 	list_to_set(WithDuplicates, Perms).
+
+sem_listas([]).
+sem_listas([E]) :- \+(is_list(E)), !.
+sem_listas([P | R]) :- \+(is_list(P)), sem_listas(R).
+
+espaco_fila([[H | _] | R], espaco(H, R), h) :- sem_listas(R).
