@@ -3,3 +3,12 @@
 
 :- [codigo_comum, puzzles_publicos].
 
+combinacoes_soma(N, Els, Soma, Combs) :-
+	setof(
+		Comb,
+		(
+			combinacao(N, Els, Comb),
+			sum_list(Comb, Soma)
+		),
+		Combs
+	).
