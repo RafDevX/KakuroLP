@@ -23,4 +23,9 @@ sem_listas([]).
 sem_listas([E]) :- \+(is_list(E)), !.
 sem_listas([P | R]) :- \+(is_list(P)), sem_listas(R).
 
-espaco_fila([[H | _] | R], espaco(H, R), h) :- sem_listas(R).
+obter_soma(H, V, Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
+
+espaco_fila([[H | V] | R], Esp, Dir) :-
+	sem_listas(R),
+	obter_soma(H, V, Dir, Soma),
+	Esp = espaco(Soma, R).
