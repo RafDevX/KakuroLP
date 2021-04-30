@@ -34,14 +34,16 @@ espacos_fila([], Esps, _, [], AccEsps) :-
 	include(espaco_nao_vazio, AccEsps, Esps). % (*)
 espacos_fila(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
-	is_list(Ultimo), !,
+	is_list(Ultimo),
+	!,
 	soma_dir(Ultimo, Dir, Soma),
 	Esp = espaco(Soma, AccEls),
 	append([Esp], AccEsps, NEsps),
 	espacos_fila(R, Esps, Dir, [], NEsps).
 espacos_fila(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
-	\+(is_list(Ultimo)), !,
+	\+(is_list(Ultimo)),
+	!,
 	append([Ultimo], AccEls, NEls),
 	espacos_fila(R, Esps, Dir, NEls, AccEsps).
 
