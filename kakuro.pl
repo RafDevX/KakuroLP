@@ -53,3 +53,12 @@ espacos_fila(Dir, Fila, Esps) :-
 espaco_fila(Fila, Esp, Dir) :-
 	espacos_fila(Dir, Fila, Esps),
 	member(Esp, Esps).
+
+espacos_puzzle(Puzzle, Espacos) :-
+	mat_transposta(Puzzle, PuzzleT),
+	maplist(espacos_fila(h), Puzzle, EspsH),
+	maplist(espacos_fila(v), PuzzleT, EspsV),
+	append(EspsH, EspacosH),
+	append(EspsV, EspacosV),
+	append(EspacosH, EspacosV, Espacos).
+	
