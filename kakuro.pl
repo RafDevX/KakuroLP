@@ -23,7 +23,7 @@ sem_listas([]).
 sem_listas([E]) :- \+(is_list(E)), !.
 sem_listas([P | R]) :- \+(is_list(P)), sem_listas(R).
 
-soma_dir([H, V], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
+soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
 separar_ultimo([E], [], E).
 separar_ultimo([P, Q], [P], Q).
@@ -37,20 +37,21 @@ separar_ultimo([P | R], I, Ultimo) :-
 	Esp = espaco(Soma, R).*/
 
 espaco_fila(Fila, Esp, Dir) :-
-	espaco_fila_aux(Fila, Esps, Dir, []),
+	espaco_fila_aux(Fila, Esps, Dir, [], []),
 	member(Esp, Esps).
 
-espaco_fila_aux([], _, _, _). % (*)
-espaco_fila_aux(Fila, Esps, Dir, Acc) :-
+espaco_fila_aux([], AccEsps, _, [], AccEsps) :- !. % (*)
+espaco_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
 	is_list(Ultimo), !,
 	soma_dir(Ultimo, Dir, Soma),
-	Esp = espaco(Soma, Acc),
-	append([Esp], Esps, NEsps),
-	espaco_fila_aux(R, NEsps, Dir, []).
-espaco_fila_aux(Fila, Esps, Dir, Acc) :-
+	Esp = espaco(Soma, AccEls),
+	append([Esp], AccEsps, NEsps),
+	espaco_fila_aux(R, Esps, Dir, [], NEsps).
+espaco_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
-	append([Ultimo], Acc, NAcc),
-	espaco_fila_aux(R, Esps, Dir, NAcc).
+	\+(is_list(Ultimo)), !,
+	append([Ultimo], AccEls, NEls),
+	espaco_fila_aux(R, Esps, Dir, NEls, AccEsps).
 
 /* falta casas vazias */
