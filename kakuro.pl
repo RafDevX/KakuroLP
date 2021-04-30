@@ -19,10 +19,6 @@ permutacoes_soma(N, Els, Soma, Perms) :-
 	append(Unmerged, WithDuplicates),
 	list_to_set(WithDuplicates, Perms).
 
-sem_listas([]).
-sem_listas([E]) :- \+(is_list(E)), !.
-sem_listas([P | R]) :- \+(is_list(P)), sem_listas(R).
-
 soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
 separar_ultimo([E], [], E).
@@ -31,27 +27,24 @@ separar_ultimo([P | R], I, Ultimo) :-
 	separar_ultimo(R, IParcial, Ultimo),
 	append([P], IParcial, I).
 
-/*espaco_fila([[H, V] | R], Esp, Dir) :-
-	sem_listas(R),
-	soma_dir([H, V], Dir, Soma),
-	Esp = espaco(Soma, R).*/
+espaco_nao_vazio(espaco(Soma, _)) :- Soma > 0.
 
-espaco_fila(Fila, Esp, Dir) :-
-	espaco_fila_aux(Fila, Esps, Dir, [], []),
-	member(Esp, Esps).
-
-espaco_fila_aux([], AccEsps, _, [], AccEsps) :- !. % (*)
-espaco_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
+espacos_fila([], Esps, _, [], AccEsps) :-
+	!,
+	include(espaco_nao_vazio, AccEsps, Esps). % (*)
+espacos_fila(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
 	is_list(Ultimo), !,
 	soma_dir(Ultimo, Dir, Soma),
 	Esp = espaco(Soma, AccEls),
 	append([Esp], AccEsps, NEsps),
-	espaco_fila_aux(R, Esps, Dir, [], NEsps).
-espaco_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
+	espacos_fila(R, Esps, Dir, [], NEsps).
+espacos_fila(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
 	\+(is_list(Ultimo)), !,
 	append([Ultimo], AccEls, NEls),
-	espaco_fila_aux(R, Esps, Dir, NEls, AccEsps).
+	espacos_fila(R, Esps, Dir, NEls, AccEsps).
 
-/* falta casas vazias */
+espaco_fila(Fila, Esp, Dir) :-
+	espacos_fila(Fila, Esps, Dir, [], []),
+	member(Esp, Esps).
