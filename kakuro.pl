@@ -3,6 +3,9 @@
 
 :- [codigo_comum, puzzles_publicos].
 
+% TODO: APAGAR ISTO
+% Puzzle = [[[0, 0], [0, 0], [0, 0], [17, 0], [10, 0]], [[0, 0], [24, 0], [11, 3], P24, P25], [[0, 16], P32, P33, P34, P35], [[0, 26], P42, P43, P44, P45], [[0, 17], P52, P53, [0, 0], [0, 0]]]
+
 combinacoes_soma(N, Els, Soma, Combs) :-
 	setof(
 		Comb,
@@ -61,4 +64,24 @@ espacos_puzzle(Puzzle, Espacos) :-
 	append(EspsH, EspacosH),
 	append(EspsV, EspacosV),
 	append(EspacosH, EspacosV, Espacos).
-	
+
+listas_independentes([], _) :- !.
+listas_independentes(_, []) :- !.
+listas_independentes([P1 | R1], [P2 | R2]) :-
+	P1 \== P2,
+	listas_independentes([P1], R2),
+	listas_independentes([P2], R1),
+	listas_independentes(R1, R2).
+
+espacos_com_posicoes_comuns(Esp, Esp) :- !, false.
+espacos_com_posicoes_comuns(espaco(_, Els1), espaco(_, Els2)) :-
+	\+(listas_independentes(Els1, Els2)).
+espacos_com_posicoes_comuns(Espacos, Esp, Esps_com) :-
+	bagof(
+		E,
+		(
+			member(E, Espacos),
+			espacos_com_posicoes_comuns(Esp, E)
+		),
+		Esps_com
+	).
