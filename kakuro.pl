@@ -104,4 +104,28 @@ permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 
 permutacoes_soma_espacos(Espacos, Perms_soma) :-
 	maplist(permutacoes_soma_espacos_aux, Espacos, Perms_soma).
-	
+
+permutacoes_soma_espaco(Esp, [[Esp, Perms] | _], Perms) :- !.
+permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
+	permutacoes_soma_espaco(Esp, R, Perms).
+
+/*permutacoes_compativeis([A, _], [_, _, A]).
+permutacoes_compativeis([_, A], [_, _, A]).*/
+
+permutacoes_compativeis(_, P1, _, P2) :- listas_independentes(P1, P2).
+
+permutacao_possivel_espaco_aux(Perms_soma, OrigEsp, Perm, Esp) :-
+	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
+	include(permutacoes_compativeis(OrigEsp, Perm, Esp), Perms, Possiveis),
+	Possiveis \== [].
+
+permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
+	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
+	member(Perm, Perms),
+	espacos_com_posicoes_comuns(Espacos, Esp, Comuns),
+	bagof(
+		P,
+		maplist(permutacao_possivel_espaco_aux(Perms_soma, Esp, P), Comuns),
+		Possiveis
+	),
+	member(Perm, Possiveis).
