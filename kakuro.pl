@@ -125,7 +125,7 @@ permutacao_possivel_espaco_aux(Perms_soma, OrigEsp, Perm, Esp) :-
 		),
 		Possiveis
 	),
-	Possiveis \== [].
+	Possiveis == Perms.
 
 permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
