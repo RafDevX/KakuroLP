@@ -120,7 +120,15 @@ permutacoes_compativeis(espaco(_, Els1), P1, espaco(_, Els2), P2) :-
 
 permutacao_possivel_espaco_aux(Perms_soma, OrigEsp, Perm, Esp) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
-	include(permutacoes_compativeis(OrigEsp, Perm, Esp), Perms, Possiveis),
+	%include(permutacoes_compativeis(OrigEsp, Perm, Esp), Perms, Possiveis),
+	bagof(
+		P,
+		(
+			member(P, Perms),
+			permutacoes_compativeis(OrigEsp, Perm, Esp, P)	
+		),
+		Possiveis
+	),
 	Possiveis \== [].
 
 permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
