@@ -33,13 +33,6 @@ permutacoes_soma(N, Els, Soma, Perms) :-
 	combinacoes_soma(N, Els, Soma, Combs),
 	permutacoes_soma_aux(Combs, PermsSemCombs),
 	append(Combs, PermsSemCombs, Perms).
-	 
-
-/*permutacoes_soma(N, Els, Soma, Perms) :-
-	combinacoes_soma(N, Els, Soma, Combs),
-	setof(P, (maplist(permutation, Combs, P)), Unmerged),
-	append(Unmerged, WithDuplicates),
-	list_to_set(WithDuplicates, Perms).*/
 
 soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
