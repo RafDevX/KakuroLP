@@ -112,7 +112,11 @@ permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
 /*permutacoes_compativeis([A, _], [_, _, A]).
 permutacoes_compativeis([_, A], [_, _, A]).*/
 
-permutacoes_compativeis(_, P1, _, P2) :- listas_independentes(P1, P2).
+permutacoes_compativeis(espaco(_, Els1), _, espaco(_, Els2), _) :-
+	listas_independentes(Els1, Els2).
+permutacoes_compativeis(espaco(_, Els1), P1, espaco(_, Els2), P2) :-
+	Els1 = P1,
+	Els2 = P2.
 
 permutacao_possivel_espaco_aux(Perms_soma, OrigEsp, Perm, Esp) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
