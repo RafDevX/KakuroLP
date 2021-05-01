@@ -16,11 +16,26 @@ combinacoes_soma(N, Els, Soma, Combs) :-
 		Combs
 	).
 
+permutacoes_soma_aux([], []).
+permutacoes_soma_aux([P | R], Perms) :-
+	setof(
+		Perm,
+		permutation(P, Perm),
+		ToAdd
+	),
+	permutacoes_soma_aux(R, PR),
+	append(ToAdd, PR, Perms).
+
 permutacoes_soma(N, Els, Soma, Perms) :-
+	combinacoes_soma(N, Els, Soma, Combs),
+	permutacoes_soma_aux(Combs, Perms).
+	 
+
+/*permutacoes_soma(N, Els, Soma, Perms) :-
 	combinacoes_soma(N, Els, Soma, Combs),
 	setof(P, (maplist(permutation, Combs, P)), Unmerged),
 	append(Unmerged, WithDuplicates),
-	list_to_set(WithDuplicates, Perms).
+	list_to_set(WithDuplicates, Perms).*/
 
 soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
@@ -85,3 +100,11 @@ espacos_com_posicoes_comuns(Espacos, Esp, Esps_com) :-
 		),
 		Esps_com
 	).
+
+permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
+	length(Els, Len),
+	permutacoes_soma(Len, [1, 2, 3, 4, 5, 6, 7, 8, 9], Soma, Perms).
+
+permutacoes_soma_espacos(Espacos, Perms_soma) :-
+	maplist(permutacoes_soma_espacos_aux, Espacos, Perms_soma).
+	
