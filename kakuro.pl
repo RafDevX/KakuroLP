@@ -20,7 +20,10 @@ permutacoes_soma_aux([], []).
 permutacoes_soma_aux([P | R], Perms) :-
 	setof(
 		Perm,
-		permutation(P, Perm),
+		(
+			permutation(P, Perm),
+			P \== Perm
+		),
 		ToAdd
 	),
 	permutacoes_soma_aux(R, PR),
@@ -28,7 +31,8 @@ permutacoes_soma_aux([P | R], Perms) :-
 
 permutacoes_soma(N, Els, Soma, Perms) :-
 	combinacoes_soma(N, Els, Soma, Combs),
-	permutacoes_soma_aux(Combs, Perms).
+	permutacoes_soma_aux(Combs, PermsSemCombs),
+	append(Combs, PermsSemCombs, Perms).
 	 
 
 /*permutacoes_soma(N, Els, Soma, Perms) :-
