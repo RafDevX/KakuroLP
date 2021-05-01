@@ -27,7 +27,7 @@ permutacoes_soma_aux([P | R], Perms) :-
 		ToAdd
 	),
 	permutacoes_soma_aux(R, PR),
-	append(ToAdd, PR, Perms).
+	append(PR, ToAdd, Perms).
 
 permutacoes_soma(N, Els, Soma, Perms) :-
 	combinacoes_soma(N, Els, Soma, Combs),
