@@ -46,7 +46,7 @@ espaco_vazio(espaco(_, Els)) :- length(Els, 0).
 
 espacos_fila_aux([], Esps, _, [], AccEsps) :-
 	!,
-	exclude(espaco_vazio, AccEsps, Esps). % (*)
+	exclude(espaco_vazio, AccEsps, Esps).
 espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
 	is_list(Ultimo),
@@ -121,7 +121,7 @@ permutacao_possivel_espaco_aux(Perms_soma, OrigEsp, Perm, Esp) :-
 		P,
 		(
 			member(P, Perms),
-			permutacoes_compativeis(OrigEsp, Perm, Esp, P)	
+			permutacoes_compativeis(OrigEsp, Perm, Esp, P)
 		),
 		Possiveis
 	),
