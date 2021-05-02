@@ -109,31 +109,15 @@ permutacoes_soma_espaco(Esp, [[Esp, Perms] | _], Perms) :- !.
 permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
 	permutacoes_soma_espaco(Esp, R, Perms).
 
-permutacoes_compativeis(espaco(_, Els1), _, espaco(_, Els2), _) :-
-	listas_independentes(Els1, Els2).
-permutacoes_compativeis(espaco(_, Els1), P1, espaco(_, Els2), P2) :-
-	Els1 = P1,
-	Els2 = P2.
-
-permutacao_possivel_espaco_aux(Perms_soma, OrigEsp, Perm, Esp) :-
+permutacao_possivel_espaco_aux(Perms_soma, espaco(_, Els1), Perm, Esp) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
-	findall( % se usasse include ele unificava
-		P,
-		(
-			member(P, Perms),
-			permutacoes_compativeis(OrigEsp, Perm, Esp, P)
-		),
-		Possiveis
-	),
-	Possiveis == Perms.
+	Esp = espaco(_, Els2),
+	% se usasse include ele "guardava" a unificação
+	findall(P, (member(P, Perms), Els1 = Perm, Els2 = P), Possiveis),
+	Possiveis \== [].
 
 permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
 	member(Perm, Perms),
 	espacos_com_posicoes_comuns(Espacos, Esp, Comuns),
-	setof(
-		P,
-		maplist(permutacao_possivel_espaco_aux(Perms_soma, Esp, P), Comuns),
-		Possiveis
-	),
-	member(Perm, Possiveis).
+	maplist(permutacao_possivel_espaco_aux(Perms_soma, Esp, Perm), Comuns).
