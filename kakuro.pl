@@ -121,3 +121,7 @@ permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
 	member(Perm, Perms),
 	espacos_com_posicoes_comuns(Espacos, Esp, Comuns),
 	maplist(permutacao_possivel_espaco_aux(Perms_soma, Esp, Perm), Comuns).
+
+permutacoes_possiveis_espaco(Espacos, Perms_soma, Esp, [Els, Poss]) :-
+	Esp = espaco(_, Els),
+	bagof(P, permutacao_possivel_espaco(P, Esp, Espacos, Perms_soma), Poss).
