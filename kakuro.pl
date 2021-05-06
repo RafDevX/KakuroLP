@@ -130,17 +130,16 @@ permutacoes_possiveis_espacos(Esps, Perms_poss_esps) :-
 	permutacoes_soma_espacos(Esps, Ps_soma),
 	maplist(permutacoes_possiveis_espaco(Esps, Ps_soma), Esps, Perms_poss_esps).
 
-aux(Pos, Num, Perm) :- % TODO: name this
-	nth1(Pos, Perm, Num).
-
+numeros_comuns([], _) :- !, false.
 numeros_comuns(Lst_perms, Nums_comuns) :-
-	findall(
+	nth1(1, Lst_perms, First),
+	length(First, LenEach),
+	bagof(
 		(Pos, Num),
 		(
-			include(aux(Pos, Num), Lst_perms, Conformados),
-			length(Conformados, L1),
-			length(Lst_perms, L2),
-			L1 =:= L2
+			between(1, LenEach, Pos),
+			nth1(Pos, First, Num),
+			forall(member(Y, Lst_perms), nth1(Pos, Y, Num))
 		),
 		Nums_comuns
 	).
