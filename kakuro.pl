@@ -96,7 +96,7 @@ espacos_com_posicoes_comuns(Espacos, Esp, Esps_com) :-
 			espacos_com_posicoes_comuns(Esp, E)
 		),
 		Esps_com
-	).
+	). % TODO: use include
 
 permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 	length(Els, Len),
@@ -134,7 +134,7 @@ numeros_comuns([], _) :- !, false.
 numeros_comuns(Lst_perms, Nums_comuns) :-
 	nth1(1, Lst_perms, First),
 	length(First, LenEach),
-	bagof(
+	findall(
 		(Pos, Num),
 		(
 			between(1, LenEach, Pos),
@@ -143,3 +143,18 @@ numeros_comuns(Lst_perms, Nums_comuns) :-
 		),
 		Nums_comuns
 	).
+
+aux3(Vars, (Pos, Num)) :- % TODO: name this
+	nth1(Pos, Vars, Var),
+	Var = Num.
+
+aux2(_, []) :- !.
+aux2(Vars, Nums) :-
+	maplist(aux3(Vars), Nums).
+
+atribui_comuns_aux([Vars, Perms]) :-
+	numeros_comuns(Perms, Nums),
+	aux2(Vars, Nums).
+
+atribui_comuns(Perms_possiveis) :-
+	maplist(atribui_comuns_aux, Perms_possiveis).
