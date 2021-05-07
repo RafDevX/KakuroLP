@@ -89,14 +89,7 @@ espacos_com_posicoes_comuns(Esp, Esp) :- !, false.
 espacos_com_posicoes_comuns(espaco(_, Els1), espaco(_, Els2)) :-
 	\+(listas_independentes(Els1, Els2)).
 espacos_com_posicoes_comuns(Espacos, Esp, Esps_com) :-
-	bagof(
-		E,
-		(
-			member(E, Espacos),
-			espacos_com_posicoes_comuns(Esp, E)
-		),
-		Esps_com
-	). % TODO: use include
+	include(espacos_com_posicoes_comuns(Esp), Espacos, Esps_com).
 
 permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 	length(Els, Len),
