@@ -157,3 +157,13 @@ retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms]) :-
 
 retira_impossiveis(Perms_possiveis, Novas_perms_possiveis) :-
 	maplist(retira_impossiveis_aux, Perms_possiveis, Novas_perms_possiveis).
+
+simplifica(Perms_poss, Novas_perms_poss) :-
+	atribui_comuns(Perms_poss),
+	retira_impossiveis(Perms_poss, Novas_perms_poss),
+	Perms_poss == Novas_perms_poss.
+simplifica(Perms_poss, Novas_perms_poss) :-
+	atribui_comuns(Perms_poss),
+	retira_impossiveis(Perms_poss, Intermedias),
+	Perms_poss \== Intermedias,
+	simplifica(Intermedias, Novas_perms_poss).
