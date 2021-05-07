@@ -151,3 +151,9 @@ atribui_comuns_aux([Vars, Perms]) :-
 
 atribui_comuns(Perms_possiveis) :-
 	maplist(atribui_comuns_aux, Perms_possiveis).
+
+retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms]) :-
+	exclude(\=(Vars), Perms, Novas_perms).
+
+retira_impossiveis(Perms_possiveis, Novas_perms_possiveis) :-
+	maplist(retira_impossiveis_aux, Perms_possiveis, Novas_perms_possiveis).
