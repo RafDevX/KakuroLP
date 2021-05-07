@@ -167,3 +167,8 @@ simplifica(Perms_poss, Novas_perms_poss) :-
 	retira_impossiveis(Perms_poss, Intermedias),
 	Perms_poss \== Intermedias,
 	simplifica(Intermedias, Novas_perms_poss).
+
+inicializa(Puzzle, Perms_poss) :-
+	espacos_puzzle(Puzzle, Espacos),
+	permutacoes_possiveis_espacos(Espacos, Perms_poss_esps),
+	simplifica(Perms_poss_esps, Perms_poss).
