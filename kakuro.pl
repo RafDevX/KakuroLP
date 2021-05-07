@@ -144,17 +144,17 @@ numeros_comuns(Lst_perms, Nums_comuns) :-
 		Nums_comuns
 	).
 
-aux3(Vars, (Pos, Num)) :- % TODO: name this
+aplica_atribuicao(Vars, (Pos, Num)) :-
 	nth1(Pos, Vars, Var),
 	Var = Num.
 
-aux2(_, []) :- !.
-aux2(Vars, Nums) :-
-	maplist(aux3(Vars), Nums).
+substitui_comuns(_, []) :- !.
+substitui_comuns(Vars, Nums) :-
+	maplist(aplica_atribuicao(Vars), Nums).
 
 atribui_comuns_aux([Vars, Perms]) :-
 	numeros_comuns(Perms, Nums),
-	aux2(Vars, Nums).
+	substitui_comuns(Vars, Nums).
 
 atribui_comuns(Perms_possiveis) :-
 	maplist(atribui_comuns_aux, Perms_possiveis).
