@@ -172,3 +172,12 @@ inicializa(Puzzle, Perms_poss) :-
 	espacos_puzzle(Puzzle, Espacos),
 	permutacoes_possiveis_espacos(Espacos, Perms_poss_esps),
 	simplifica(Perms_poss_esps, Perms_poss).
+
+escolhe_menos_alternativas(Perms_poss, [VarsEscolha, PermsEscolha]) :-
+	maplist(nth1(2), Perms_poss, Perms),
+	maplist(length, Perms, Lens),
+	exclude(>(2), Lens, ProperLens),
+	ProperLens \== [],
+	min_list(ProperLens, MinLen),
+	member([VarsEscolha, PermsEscolha], Perms_poss),
+	length(PermsEscolha, MinLen).
