@@ -200,6 +200,10 @@ resolve_aux(Perms_poss, Novas_perms_poss) :-
 	simplifica(Intermedias, Simplificadas),
 	resolve_aux(Simplificadas, Novas_perms_poss).
 
+resolve(Puz) :-
+	inicializa(Puz, Perms_poss),
+	resolve_aux(Perms_poss, _).
+
 /* FIXME: delete below
 
 erro gaspar
