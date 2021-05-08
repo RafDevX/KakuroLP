@@ -201,5 +201,17 @@ resolve_aux(Perms_poss, Perms_poss) :-
 resolve_aux(Perms_poss, Novas_perms_poss) :-
 	escolhe_menos_alternativas(Perms_poss, Escolha),
 	experimenta_perm(Escolha, Perms_poss, Intermedias),
+	writeln(">> INTERMEDIAS:"),
+	maplist(writeln, Intermedias),
+	writeln("<<"),
 	simplifica(Intermedias, Simplificadas),
 	resolve_aux(Simplificadas, Novas_perms_poss).
+
+/* FIXME: delete below
+
+erro gaspar
+
+Var_case_convention
+Se tiver aridade diferente, usar o mesmo nome
+
+*/
