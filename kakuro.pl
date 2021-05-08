@@ -185,3 +185,14 @@ escolhe_menos_alternativas(Perms_poss, [VarsEscolha, PermsEscolha]) :-
 	ProperLens \== [],
 	min_list(ProperLens, MinLen),
 	primeiro_com_perms_tamanho(Perms_poss, MinLen, [VarsEscolha, PermsEscolha]).
+
+experimenta_perm([Esp, Lst_perms], Antes, [[Esp, [Perm]] | R], Acc) :-
+	member(Perm, Lst_perms),
+	Esp = Perm, !,
+	append([Antes, [Esp, [Perm]], R], Acc).
+experimenta_perm(Escolha, Antes, [P | R], Acc) :-
+	append(Antes, [P], NAntes),
+	experimenta_perm(Escolha, NAntes, R, Acc).
+
+experimenta_perm(Escolha, Perms_poss, Novas_perms_poss) :-
+	experimenta_perm(Escolha, [], Perms_poss, Novas_perms_poss).
