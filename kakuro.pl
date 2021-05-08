@@ -189,9 +189,17 @@ escolhe_menos_alternativas(Perms_poss, [VarsEscolha, PermsEscolha]) :-
 experimenta_perm([Esp, Lst_perms], Antes, [[Esp, _] | R], Acc) :-
 	member(Perm, Lst_perms),
 	Esp = Perm, !,
-	append([Antes, [[Esp, [Perm]], R]], Acc).
+	append([Antes, [[Esp, [Perm]]], R], Acc).
 experimenta_perm(Escolha, Antes, [P | R], Acc) :-
 	append(Antes, [P], NAntes),
 	experimenta_perm(Escolha, NAntes, R, Acc).
 experimenta_perm(Escolha, Perms_poss, Novas_perms_poss) :-
 	experimenta_perm(Escolha, [], Perms_poss, Novas_perms_poss).
+
+resolve_aux(Perms_poss, Perms_poss) :-
+	forall(member([_, Perms], Perms_poss), length(Perms, 1)).
+resolve_aux(Perms_poss, Novas_perms_poss) :-
+	escolhe_menos_alternativas(Perms_poss, Escolha),
+	experimenta_perm(Escolha, Perms_poss, Intermedias),
+	simplifica(Intermedias, Simplificadas),
+	resolve_aux(Simplificadas, Novas_perms_poss).
