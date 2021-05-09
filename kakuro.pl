@@ -105,7 +105,7 @@ permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
 permutacao_possivel_espaco_aux(Perms_soma, espaco(_, Els1), Perm, Esp) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
 	Esp = espaco(_, Els2),
-	% se usasse include ele "guardava" a unificação
+	% se usasse include, a unificacao seria preservada
 	findall(P, (member(P, Perms), Els1 = Perm, Els2 = P), Possiveis),
 	Possiveis \== [].
 
