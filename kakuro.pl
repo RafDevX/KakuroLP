@@ -117,7 +117,7 @@ permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
 
 permutacoes_possiveis_espaco(Espacos, Perms_soma, Esp, [Els, Poss]) :-
 	Esp = espaco(_, Els),
-	bagof(P, permutacao_possivel_espaco(P, Esp, Espacos, Perms_soma), Poss).
+	findall(P, permutacao_possivel_espaco(P, Esp, Espacos, Perms_soma), Poss).
 
 permutacoes_possiveis_espacos(Esps, Perms_poss_esps) :-
 	permutacoes_soma_espacos(Esps, Ps_soma),
