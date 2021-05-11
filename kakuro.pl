@@ -1,31 +1,14 @@
 % Rafael Serra e Oliveira 99311
 % Projeto de Logica para Programacao, Y1S2 LEIC-A IST, 2020/21
 
-:- [codigo_comum, puzzles_publicos].
-
-% TODO: APAGAR ISTO
-% Puzzle = [[[0, 0], [0, 0], [0, 0], [17, 0], [10, 0]], [[0, 0], [24, 0], [11, 3], P24, P25], [[0, 16], P32, P33, P34, P35], [[0, 26], P42, P43, P44, P45], [[0, 17], P52, P53, [0, 0], [0, 0]]]
+:- [codigo_comum].
 
 combinacoes_soma(N, Els, Soma, Combs) :-
-	setof(
-		Comb,
-		(
-			combinacao(N, Els, Comb),
-			sum_list(Comb, Soma)
-		),
-		Combs
-	).
+	setof(Comb, (combinacao(N, Els, Comb), sum_list(Comb, Soma)), Combs).
 
 permutacoes_soma_aux([], []).
 permutacoes_soma_aux([P | R], Perms) :-
-	setof(
-		Perm,
-		(
-			permutation(P, Perm),
-			P \== Perm
-		),
-		ToAdd
-	),
+	setof(Perm, (permutation(P, Perm), P \== Perm), ToAdd),
 	permutacoes_soma_aux(R, PR),
 	append(PR, ToAdd, Perms).
 
@@ -57,7 +40,7 @@ espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	espacos_fila_aux(R, Esps, Dir, [], NEsps).
 espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
-	\+(is_list(Ultimo)),
+	\+ is_list(Ultimo),
 	!,
 	append([Ultimo], AccEls, NEls),
 	espacos_fila_aux(R, Esps, Dir, NEls, AccEsps).
@@ -85,11 +68,12 @@ listas_independentes([P1 | R1], [P2 | R2]) :-
 	listas_independentes([P2], R1),
 	listas_independentes(R1, R2).
 
-espacos_com_posicoes_comuns(Esp, Esp) :- !, false.
-espacos_com_posicoes_comuns(espaco(_, Els1), espaco(_, Els2)) :-
-	\+(listas_independentes(Els1, Els2)).
-espacos_com_posicoes_comuns(Espacos, Esp, Esps_com) :-
-	include(espacos_com_posicoes_comuns(Esp), Espacos, Esps_com).
+espacos_com_posicoes_comuns_aux(Esp, Esp) :- !, false.
+espacos_com_posicoes_comuns_aux(espaco(_, Els1), espaco(_, Els2)) :-
+	\+ listas_independentes(Els1, Els2).
+
+espacos_com_posicoes_comuns(Espacos, Esp, EspsCom) :-
+	include(espacos_com_posicoes_comuns_aux(Esp), Espacos, EspsCom).
 
 permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 	length(Els, Len),
@@ -98,8 +82,7 @@ permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 permutacoes_soma_espacos(Espacos, Perms_soma) :-
 	maplist(permutacoes_soma_espacos_aux, Espacos, Perms_soma).
 
-permutacoes_soma_espaco(Esp, [[EspI, Perms] | _], Perms) :-
-	Esp == EspI, !.
+permutacoes_soma_espaco(Esp, [[EspI, Perms] | _], Perms) :- Esp == EspI, !.
 permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
 	permutacoes_soma_espaco(Esp, R, Perms).
 
@@ -128,15 +111,11 @@ numeros_comuns([], _) :- !, false.
 numeros_comuns(Lst_perms, Nums_comuns) :-
 	nth1(1, Lst_perms, First),
 	length(First, LenEach),
-	findall(
-		(Pos, Num),
-		(
-			between(1, LenEach, Pos),
-			nth1(Pos, First, Num),
-			forall(member(Y, Lst_perms), nth1(Pos, Y, Num))
-		),
-		Nums_comuns
-	).
+	findall((Pos, Num), (
+		between(1, LenEach, Pos),
+		nth1(Pos, First, Num),
+		forall(member(Y, Lst_perms), nth1(Pos, Y, Num))
+	), Nums_comuns).
 
 aplica_atribuicao(Vars, (Pos, Num)) :-
 	nth1(Pos, Vars, Var),
@@ -204,12 +183,3 @@ resolve_aux(Perms_poss, Novas_perms_poss) :-
 resolve(Puz) :-
 	inicializa(Puz, Perms_poss),
 	resolve_aux(Perms_poss, _).
-
-/* FIXME: delete below
-
-erro gaspar
-
-Var_case_convention
-Se tiver aridade diferente, usar o mesmo nome
-
-*/
