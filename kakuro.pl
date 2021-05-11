@@ -26,12 +26,10 @@ separar_ultimo(Lst, R, El) :-
 espaco_vazio(espaco(_, Els)) :- length(Els, 0).
 
 espacos_fila_aux([], Esps, _, [], AccEsps) :-
-	!,
-	exclude(espaco_vazio, AccEsps, Esps).
+	!, exclude(espaco_vazio, AccEsps, Esps).
 espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
-	is_list(Ultimo),
-	!,
+	is_list(Ultimo), !,
 	soma_dir(Ultimo, Dir, Soma),
 	Esp = espaco(Soma, AccEls),
 	append([Esp], AccEsps, NEsps),
