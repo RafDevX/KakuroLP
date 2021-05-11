@@ -98,7 +98,8 @@ permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 permutacoes_soma_espacos(Espacos, Perms_soma) :-
 	maplist(permutacoes_soma_espacos_aux, Espacos, Perms_soma).
 
-permutacoes_soma_espaco(Esp, [[Esp, Perms] | _], Perms) :- !.
+permutacoes_soma_espaco(Esp, [[EspI, Perms] | _], Perms) :-
+	Esp == EspI, !.
 permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
 	permutacoes_soma_espaco(Esp, R, Perms).
 
