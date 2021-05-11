@@ -19,11 +19,9 @@ permutacoes_soma(N, Els, Soma, Perms) :-
 
 soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
-separar_ultimo([E], [], E).
-separar_ultimo([P, Q], [P], Q).
-separar_ultimo([P | R], I, Ultimo) :-
-	separar_ultimo(R, IParcial, Ultimo),
-	append([P], IParcial, I).
+separar_ultimo(Lst, R, El) :-
+	last(Lst, El),
+	append(R, [El], Lst).
 
 espaco_vazio(espaco(_, Els)) :- length(Els, 0).
 
