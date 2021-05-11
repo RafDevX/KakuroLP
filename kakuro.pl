@@ -38,8 +38,6 @@ espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	espacos_fila_aux(R, Esps, Dir, [], NEsps).
 espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	separar_ultimo(Fila, R, Ultimo),
-	\+ is_list(Ultimo),
-	!,
 	append([Ultimo], AccEls, NEls),
 	espacos_fila_aux(R, Esps, Dir, NEls, AccEsps).
 
