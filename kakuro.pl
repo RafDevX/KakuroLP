@@ -166,13 +166,12 @@ experimenta_perm([Esp, Lst_perms], Perms_poss, Novas_perm_poss) :-
 	append(Antes, [[Esp, Lst_perms] | Depois], Perms_poss),
 	append(Antes, [[Esp, [Perm]] | Depois], Novas_perm_poss).
 
-resolve_aux(Perms_poss, Perms_poss) :-
-	forall(member([_, Perms], Perms_poss), length(Perms, 1)).
 resolve_aux(Perms_poss, Novas_perms_poss) :-
-	escolhe_menos_alternativas(Perms_poss, Escolha),
+	escolhe_menos_alternativas(Perms_poss, Escolha), !,
 	experimenta_perm(Escolha, Perms_poss, Intermedias),
 	simplifica(Intermedias, Simplificadas),
 	resolve_aux(Simplificadas, Novas_perms_poss).
+resolve_aux(Perms_poss, Perms_poss).
 
 resolve(Puz) :-
 	inicializa(Puz, Perms_poss),
