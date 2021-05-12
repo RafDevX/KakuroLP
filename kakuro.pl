@@ -3,15 +3,31 @@
 
 :- [codigo_comum].
 
+% % [ 3.1.1 ] % %
+%
+% combinacoes_soma(N, Els, Soma, Combs)
+% Sendo N um inteiro, Els uma lista de inteiros e Soma um inteiro, o predicado
+% e verdadeiro se Combs for a lista ordenada cujos elementos sao as combinacoes
+% N a N dos elementos de Els cuja soma e Soma.
 combinacoes_soma(N, Els, Soma, Combs) :-
 	setof(Comb, (combinacao(N, Els, Comb), sum_list(Comb, Soma)), Combs).
 
+
+% % [ 3.1.2 ] % %
+%
+% permutacoes_soma_aux(Lst, Perms)
+% Sendo Lst uma lista de combinacoes, o predicado e verdadeiro se Perms for
+% a lista de permutacoes de Lst excluindo os proprios elementos.
 permutacoes_soma_aux([], []).
 permutacoes_soma_aux([P | R], Perms) :-
 	setof(Perm, (permutation(P, Perm), P \== Perm), ToAdd),
 	permutacoes_soma_aux(R, PR),
 	append(PR, ToAdd, Perms).
 
+% permutacoes_soma(N, Els, Soma, Perms)
+% Sendo N um inteiro, Els uma lista de inteiros e Soma um inteiro, o predicado
+% e verdadeiro se Perms for a lista ordenada cujos elementos sao as permutacoes
+% das combinacoes N a N dos elementos de Els cuja soma e Soma.
 permutacoes_soma(N, Els, Soma, Perms) :-
 	combinacoes_soma(N, Els, Soma, Combs),
 	permutacoes_soma_aux(Combs, PermsSemCombs),
