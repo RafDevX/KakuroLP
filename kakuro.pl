@@ -33,14 +33,31 @@ permutacoes_soma(N, Els, Soma, Perms) :-
 	permutacoes_soma_aux(Combs, PermsSemCombs),
 	append(Combs, PermsSemCombs, Perms).
 
+
+% % [ 3.1.4 ] % %
+%
+% soma_dir([H, V], Dir, Soma)
+% Sendo H e V inteiros, o predicado e verdadeiro se Soma for unificavel com H,
+% caso Dir seja o atomo h, ou se Soma for unificavel com V, caso contrario.
 soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
+% separar_ultimo(Lst, R, El)
+% Sendo Lst e R listas, o predicado e verdadeiro se El for o ultimo elemento
+% de Lst e R for a lista obtida removendo esse ultimo elemento de Lst.
 separar_ultimo(Lst, R, El) :-
 	last(Lst, El),
 	append(R, [El], Lst).
 
-espaco_vazio(espaco(_, Els)) :- length(Els, 0).
+% espaco_vazio(Esp)
+% Sendo Esp um espaco, o predicado e verdadeiro se a lista das posicoes de Esp
+% for unificavel com a lista vazia.
+espaco_vazio(espaco(_, [])).
 
+% espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps)
+% Sendo Fila uma fila (linha ou coluna) de um puzzle e Dir um dos atomos h ou v,
+% o predicado e verdadeiro se Esps for a lista dos espacos de Fila, sendo AccEls
+% e AccEsps acumuladores (respetivamente, de elementos e espacos) para facilitar
+% o processo recursivo.
 espacos_fila_aux([], Esps, _, [], AccEsps) :-
 	!, exclude(espaco_vazio, AccEsps, Esps).
 espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
@@ -55,13 +72,28 @@ espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	append([Ultimo], AccEls, NEls),
 	espacos_fila_aux(R, Esps, Dir, NEls, AccEsps).
 
+% espacos_fila(Dir, Fila, Esps)
+% Sendo Dir um dos atomos h ou v e Fila uma fila de um puzzle, o predicado e
+% verdadeiro se Esps for a lista dos seus espacos.
 espacos_fila(Dir, Fila, Esps) :-
 	espacos_fila_aux(Fila, Esps, Dir, [], []).
 
+
+% % [ 3.1.3 ] % %
+%
+% espaco_fila(Fila, Esp, Dir)
+% Sendo Fila uma fila de um puzzle e Dir um dos atomos h ou v, o predicado e
+% verdadeiro se Esp for um espaco de Fila.
 espaco_fila(Fila, Esp, Dir) :-
 	espacos_fila(Dir, Fila, Esps),
 	member(Esp, Esps).
 
+
+% % [ 3.1.5 ] % %
+%
+% espacos_puzzle(Puzzle, Espacos)
+% Sendo Puzzle um puzzle, o predicado e verdadeiro se Espacos for a lista de
+% todos os espacos de Puzzle.
 espacos_puzzle(Puzzle, Espacos) :-
 	mat_transposta(Puzzle, PuzzleT),
 	maplist(espacos_fila(h), Puzzle, EspsH),
@@ -70,6 +102,12 @@ espacos_puzzle(Puzzle, Espacos) :-
 	append(EspsV, EspacosV),
 	append(EspacosH, EspacosV, Espacos).
 
+
+% % [ 3.1.6 ] % %
+%
+% listas_independentes(L1, L2)
+% Sendo L1 e L2 duas listas, o predicado e verdadeiro se essas listas nao
+% tiverem elementos em comum. TODO: redo with intersection
 listas_independentes([], _) :- !.
 listas_independentes(_, []) :- !.
 listas_independentes([P1 | R1], [P2 | R2]) :-
@@ -78,13 +116,23 @@ listas_independentes([P1 | R1], [P2 | R2]) :-
 	listas_independentes([P2], R1),
 	listas_independentes(R1, R2).
 
-espacos_com_posicoes_comuns_aux(Esp, Esp) :- !, false.
+% espacos_com_posicoes_comuns_aux(Esp1, Esp2)
+% Sendo Esp1 e Esp2 dois espacos, o predicado e verdadeiro se esses dois espacos
+% tiverem variaveis em comum e nao forem o mesmo espaco.
+espacos_com_posicoes_comuns_aux(Esp1, Esp2) :- Esp1 == Esp2, !, false.
 espacos_com_posicoes_comuns_aux(espaco(_, Els1), espaco(_, Els2)) :-
 	\+ listas_independentes(Els1, Els2).
 
+% espacos_com_posicoes_comuns(Espacos, Esp, EspsCom)
+% Sendo Espacos uma lista de espacos e Esp um espaco, o predicado e verdadeiro
+% se EspsCom for a lista de espacos com variaveis em comum com Esp, exceptuando
+% o proprio Esp.
 espacos_com_posicoes_comuns(Espacos, Esp, EspsCom) :-
 	include(espacos_com_posicoes_comuns_aux(Esp), Espacos, EspsCom).
 
+% % [ 3.1.7 ] % %
+%
+% ...
 permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 	length(Els, Len),
 	permutacoes_soma(Len, [1, 2, 3, 4, 5, 6, 7, 8, 9], Soma, Perms).
