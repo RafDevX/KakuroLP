@@ -130,20 +130,37 @@ espacos_com_posicoes_comuns_aux(espaco(_, Els1), espaco(_, Els2)) :-
 espacos_com_posicoes_comuns(Espacos, Esp, EspsCom) :-
 	include(espacos_com_posicoes_comuns_aux(Esp), Espacos, EspsCom).
 
+
 % % [ 3.1.7 ] % %
 %
-% ...
+% permutacoes_soma_espacos_aux(Esp, [Esp, Perms])
+% Sendo Esp um espaco, o predicado e verdadeiro quando Perms e a lista ordenada
+% de permutacoes cuja soma e igual a soma de Esp.
 permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 	length(Els, Len),
 	permutacoes_soma(Len, [1, 2, 3, 4, 5, 6, 7, 8, 9], Soma, Perms).
 
+% permutacoes_soma_espacos(Espacos, Perms_soma)
+% Sendo Espacos uma lista de espacos, o predicado e verdadeiro se Perms_soma e
+% a lista de listas de 2 elementos, em que o 1o elemento e um espaco de Espacos
+% e o 2o e a lista ordenada de permutacoes cuja soma e igual a soma do espaco.
 permutacoes_soma_espacos(Espacos, Perms_soma) :-
 	maplist(permutacoes_soma_espacos_aux, Espacos, Perms_soma).
 
+% % [ 3.1.8 ] % %
+% permutacoes_soma_espaco(Esp, Perms_soma, Perms)
+% Sendo Esp um espaco e Perms_soma uma lista de listas tal como obtida pelo
+% predicado permutacoes_soma_espacos, o predicado e verdadeiro se Perms for
+% a lista ordenada de permutacoes associada por Perms_soma a Esp.
 permutacoes_soma_espaco(Esp, [[EspI, Perms] | _], Perms) :- Esp == EspI, !.
 permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
 	permutacoes_soma_espaco(Esp, R, Perms).
 
+% permutacao_possivel_espaco_aux(Perms_soma, Esp1, Perm, Esp2)
+% Sendo Esp1 e Esp2 dois espacos, Perm uma permutacao e ainda Perms_soma uma
+% lista de listas como obtida pelo predicado permutacoes_soma_espacos, o
+% predicado e verdadeiro se Perm for simultaneamente aplicavel aos elementos de
+% Esp1 como aos de Esp2.
 permutacao_possivel_espaco_aux(Perms_soma, espaco(_, Els1), Perm, Esp) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
 	Esp = espaco(_, Els2),
@@ -151,20 +168,47 @@ permutacao_possivel_espaco_aux(Perms_soma, espaco(_, Els1), Perm, Esp) :-
 	findall(P, (member(P, Perms), Els1 = Perm, Els2 = P), Possiveis),
 	Possiveis \== [].
 
+% permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma)
+% Sendo Perm uma permutacao, Esp um espaco, Espacos uma lista de espacos e ainda
+% Perms_soma uma lista tal como obtida pelo predicado permutacoes_soma_espacos,
+% o predicado e verdadeiro se Perm for uma permutacao possivel para o espaco
+% Esp, nao havendo conflitos com nenhum outro espaco em Espacos.
 permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
 	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
 	member(Perm, Perms),
 	espacos_com_posicoes_comuns(Espacos, Esp, Comuns),
 	maplist(permutacao_possivel_espaco_aux(Perms_soma, Esp, Perm), Comuns).
 
+
+% % [ 3.1.9 ] % %
+%
+% permutacoes_possiveis_espaco(Espacos, Perms_soma, Esp, Perms_poss)
+% Sendo Espacos uma lista de espacos, Perms_soma uma lista de listas como obtida
+% pelo predicado permutacoes_soma_espacos e Esp um espaco, o predicado e
+% verdadeiro se Perms_poss for uma lista de 2 elementos em que o primeiro e a
+% lista de variaveis de Esp e o segundo e a lista ordenada de permutacoes
+% possiveis para o espaco Esp.
 permutacoes_possiveis_espaco(Espacos, P_soma, Esp, [Els, Poss]) :-
 	Esp = espaco(_, Els),
 	setof(P, P_soma^permutacao_possivel_espaco(P, Esp, Espacos, P_soma), Poss).
 
+
+% % [ 3.1.10 ] %
+%
+% permutacoes_possiveis_espacos(Espacos, Perms_poss_esps)
+% Sendo Espacos uma lista de espacos, o predicado e verdadeiro se
+% Perms_poss_esps for a lista de permutacoes possiveis para esses espacos.
 permutacoes_possiveis_espacos(Esps, Perms_poss_esps) :-
 	permutacoes_soma_espacos(Esps, Ps_soma),
 	maplist(permutacoes_possiveis_espaco(Esps, Ps_soma), Esps, Perms_poss_esps).
 
+
+% % [ 3.1.11 ] % %
+%
+% numeros_comuns(Lst_perms, Numeros_comuns)
+% Sendo Lst_perms uma lista de permutacoes, o predicado e verdadeiro se
+% Numeros_comuns for uma lista de pares (pos, num) e todas as listas de
+% Lst_perms contiverem o mesmo numero, num, na posicao pos.
 numeros_comuns([], _) :- !, false.
 numeros_comuns(Lst_perms, Nums_comuns) :-
 	nth1(1, Lst_perms, First),
@@ -175,18 +219,37 @@ numeros_comuns(Lst_perms, Nums_comuns) :-
 		forall(member(Y, Lst_perms), nth1(Pos, Y, Num))
 	), Nums_comuns).
 
+
+% % [ 3.1.12 ] % %
+%
+% aplica_atribuicao(Vars, (Pos, Num))
+% Sendo Vars uma lista, Pos uma posicao uma variavel dessa lista e Num um
+% numero, o predicado e verdadeiro se o elemento de Vars na posicao Pos for
+% unificavel com Num.
 aplica_atribuicao(Vars, (Pos, Num)) :-
 	nth1(Pos, Vars, Var),
 	Var = Num.
 
+% substitui_comuns(Vars, Nums)
+% Sendo Vars uma lista e Nums uma lista de pares (pos, num), o predicado e
+% verdadeiro se para todas as posicoes pos for possivel unificar o elemento de
+% Vars nessa posicao com num.
 substitui_comuns(_, []) :- !.
 substitui_comuns(Vars, Nums) :-
 	maplist(aplica_atribuicao(Vars), Nums).
 
+% atribui_comuns_aux([Vars, Perms])
+% Sendo Vars uma lista de elementos de um espaco e Perms uma lista de
+% permutacoes possiveis para esse espaco, o predicado e verdadeiro se Vars for
+% unificavel com os numeros comuns obtidos pelo predicado numeros_comuns.
 atribui_comuns_aux([Vars, Perms]) :-
 	numeros_comuns(Perms, Nums),
 	substitui_comuns(Vars, Nums).
 
+% atribui_comuns(Perms_possiveis)
+% Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
+% verdadeiro se essa lista for atualizavel para ser atribuido a cada espaco
+% numeros comuns a todas as permutacoes possiveis para esse espaco.
 atribui_comuns(Perms_possiveis) :-
 	maplist(atribui_comuns_aux, Perms_possiveis).
 
