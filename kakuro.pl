@@ -253,12 +253,31 @@ atribui_comuns_aux([Vars, Perms]) :-
 atribui_comuns(Perms_possiveis) :-
 	maplist(atribui_comuns_aux, Perms_possiveis).
 
+
+% % [ 3.1.13 ] % %
+%
+% retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms])
+% Sendo Vars uma lista e Perms uma lista de permutacoes possiveis para esse
+% espaco, o predicado e verdadeiro se Novas_perms for a lista obtida excluindo
+% de Perms as permutacoes que nao sao unificaveis com Vars.
 retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms]) :-
 	exclude(\=(Vars), Perms, Novas_perms).
 
+% retira_impossiveis(Perms_possiveis, Novas_perms_possiveis)
+% Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
+% verdadeiro se Novas_perms_possiveis for o resultado de tirar as permutacoes
+% impossiveis de Perms_possiveis.
 retira_impossiveis(Perms_possiveis, Novas_perms_possiveis) :-
 	maplist(retira_impossiveis_aux, Perms_possiveis, Novas_perms_possiveis).
 
+
+% % [ 3.1.14 ] % %
+% 
+% simplifica(Perms_possiveis, Novas_perms_possiveis)
+% Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
+% verdadeiro se Novas_perms_possiveis for o resultado de simplificar a lista
+% Perms_possiveis, ou seja, de repetidamente aplicar os predicados
+% atribui_comuns e retira_impossiveis ate nao haver mais alteracoes.
 simplifica(Perms_poss, Novas_perms_poss) :-
 	atribui_comuns(Perms_poss),
 	retira_impossiveis(Perms_poss, Novas_perms_poss),
@@ -269,16 +288,32 @@ simplifica(Perms_poss, Novas_perms_poss) :-
 	Perms_poss \== Intermedias,
 	simplifica(Intermedias, Novas_perms_poss).
 
+
+% % [ 3.1.15 ] % %
+%
+% inicializa(Puzzle, Perms_possiveis)
+% Sendo Puzzle um puzzle, o predicado e verdadeiro se Perms_possiveis for a
+% lista de permutacoes possiveis simplificada para Puzzle.
 inicializa(Puzzle, Perms_poss) :-
 	espacos_puzzle(Puzzle, Espacos),
 	permutacoes_possiveis_espacos(Espacos, Perms_poss_esps),
 	simplifica(Perms_poss_esps, Perms_poss).
 
+% % [ 3.2.1 ] % %
+%
+% primeiro_com_perms_tamanho(Perms, Len, Perm)
+% Sendo Perms uma lista de permutacoes possiveis e Len um numero, o predicado e
+% verdadeiro se Perm for a primeira permutacao (incluindo variaveis do espaco)
+% em Perms com tamanho Len.
 primeiro_com_perms_tamanho([[V, P] | _], Len, [V, P]) :-
 	length(P, Len), !.
 primeiro_com_perms_tamanho([_ | R], Len, E) :-
 	primeiro_com_perms_tamanho(R, Len, E).
 
+% escolhe_menos_alternativas(Perms_possiveis, Escolha)
+% Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
+% verdadeiro se Escolha for o primeiro elemento de Perms_possiveis com menos
+% alternativas de permutacoes, desde que nao unitarias.
 escolhe_menos_alternativas(Perms_poss, [VarsEscolha, PermsEscolha]) :-
 	maplist(nth1(2), Perms_poss, Perms),
 	maplist(length, Perms, Lens),
@@ -287,12 +322,30 @@ escolhe_menos_alternativas(Perms_poss, [VarsEscolha, PermsEscolha]) :-
 	min_list(ProperLens, MinLen),
 	primeiro_com_perms_tamanho(Perms_poss, MinLen, [VarsEscolha, PermsEscolha]).
 
+
+% % [ 3.2.2 ] % %
+%
+% experimenta_perm(Escolha, Perms_possiveis, Novas_perms_possiveis)
+% Sendo Perms_possiveis uma lista de permutacoes possiveis e Escolha um dos
+% seus elementos, o predicado e verdadeiro se, para uma permutacao Perm das
+% permutacoes de Escolha, o espaco que lhe esta associado for unificavel com
+% Perm e Novas_perms_possiveis for a lista obtida substituindo o elemento
+% Escolha pela lista de dois elementos com primeiro elemento igual ao espaco
+% associado a Perm e segundo elemento [Perm].
 experimenta_perm([Esp, Lst_perms], Perms_poss, Novas_perm_poss) :-
 	member(Perm, Lst_perms),
 	Esp = Perm,
 	append(Antes, [[Esp, Lst_perms] | Depois], Perms_poss),
 	append(Antes, [[Esp, [Perm]] | Depois], Novas_perm_poss).
 
+
+% % [ 3.2.3 ] % %
+%
+% resolve_aux(Perms_possiveis, Novas_perms_possiveis)
+% Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
+% verdadeiro se Novas_perms_possiveis for a lista resultante de repetidamente
+% aplicar os predicados escolhe_menos_alternativas, experimenta_perm e
+% simplifica ate nao haver alteracoes.
 resolve_aux(Perms_poss, Novas_perms_poss) :-
 	escolhe_menos_alternativas(Perms_poss, Escolha), !,
 	experimenta_perm(Escolha, Perms_poss, Intermedias),
@@ -300,6 +353,12 @@ resolve_aux(Perms_poss, Novas_perms_poss) :-
 	resolve_aux(Simplificadas, Novas_perms_poss).
 resolve_aux(Perms_poss, Perms_poss).
 
+% % [ 3.3.1 ] % %
+%
+% resolve(Puzzle)
+% Sendo Puzzle um puzzle, o predicado e verdadeiro se Puzzle for unificavel
+% com a sua resolucao, ou seja, a sua grelha com todas as variaveis
+% substituidas por numeros que respeitam as restricoes desse puzzle.
 resolve(Puz) :-
 	inicializa(Puz, Perms_poss),
 	resolve_aux(Perms_poss, _).
