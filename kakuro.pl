@@ -3,8 +3,9 @@
 
 :- [codigo_comum].
 
+
 % % [ 3.1.1 ] % %
-%
+
 % combinacoes_soma(N, Els, Soma, Combs)
 % Sendo N um inteiro, Els uma lista de inteiros e Soma um inteiro, o predicado
 % e verdadeiro se Combs for a lista ordenada cujos elementos sao as combinacoes
@@ -14,15 +15,6 @@ combinacoes_soma(N, Els, Soma, Combs) :-
 
 
 % % [ 3.1.2 ] % %
-%
-% permutacoes_soma_aux(Lst, Perms)
-% Sendo Lst uma lista de combinacoes, o predicado e verdadeiro se Perms for
-% a lista de permutacoes de Lst excluindo os proprios elementos.
-permutacoes_soma_aux([], []).
-permutacoes_soma_aux([P | R], Perms) :-
-	setof(Perm, (permutation(P, Perm), P \== Perm), ToAdd),
-	permutacoes_soma_aux(R, PR),
-	append(PR, ToAdd, Perms).
 
 % permutacoes_soma(N, Els, Soma, Perms)
 % Sendo N um inteiro, Els uma lista de inteiros e Soma um inteiro, o predicado
@@ -33,25 +25,33 @@ permutacoes_soma(N, Els, Soma, Perms) :-
 	permutacoes_soma_aux(Combs, PermsSemCombs),
 	append(Combs, PermsSemCombs, Perms).
 
+% permutacoes_soma_aux(Lst, Perms)
+% Sendo Lst uma lista de combinacoes, o predicado e verdadeiro se Perms for
+% a lista de permutacoes de Lst excluindo os proprios elementos.
+permutacoes_soma_aux([], []).
+permutacoes_soma_aux([P | R], Perms) :-
+	setof(Perm, (permutation(P, Perm), P \== Perm), ToAdd),
+	permutacoes_soma_aux(R, PR),
+	append(PR, ToAdd, Perms).
+
+
+% % [ 3.1.3 ] % %
+
+% espaco_fila(Fila, Esp, Dir)
+% Sendo Fila uma fila de um puzzle e Dir um dos atomos h ou v, o predicado e
+% verdadeiro se Esp for um espaco de Fila.
+espaco_fila(Fila, Esp, Dir) :-
+	espacos_fila(Dir, Fila, Esps),
+	member(Esp, Esps).
+
 
 % % [ 3.1.4 ] % %
-%
-% soma_dir([H, V], Dir, Soma)
-% Sendo H e V inteiros, o predicado e verdadeiro se Soma for unificavel com H,
-% caso Dir seja o atomo h, ou se Soma for unificavel com V, caso contrario.
-soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
-% separar_ultimo(Lst, R, El)
-% Sendo Lst e R listas, o predicado e verdadeiro se El for o ultimo elemento
-% de Lst e R for a lista obtida removendo esse ultimo elemento de Lst.
-separar_ultimo(Lst, R, El) :-
-	last(Lst, El),
-	append(R, [El], Lst).
-
-% espaco_vazio(Esp)
-% Sendo Esp um espaco, o predicado e verdadeiro se a lista das posicoes de Esp
-% for unificavel com a lista vazia.
-espaco_vazio(espaco(_, [])).
+% espacos_fila(Dir, Fila, Esps)
+% Sendo Dir um dos atomos h ou v e Fila uma fila de um puzzle, o predicado e
+% verdadeiro se Esps for a lista dos seus espacos.
+espacos_fila(Dir, Fila, Esps) :-
+	espacos_fila_aux(Fila, Esps, Dir, [], []).
 
 % espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps)
 % Sendo Fila uma fila (linha ou coluna) de um puzzle e Dir um dos atomos h ou v,
@@ -72,21 +72,22 @@ espacos_fila_aux(Fila, Esps, Dir, AccEls, AccEsps) :-
 	append([Ultimo], AccEls, NEls),
 	espacos_fila_aux(R, Esps, Dir, NEls, AccEsps).
 
-% espacos_fila(Dir, Fila, Esps)
-% Sendo Dir um dos atomos h ou v e Fila uma fila de um puzzle, o predicado e
-% verdadeiro se Esps for a lista dos seus espacos.
-espacos_fila(Dir, Fila, Esps) :-
-	espacos_fila_aux(Fila, Esps, Dir, [], []).
+% soma_dir([H, V], Dir, Soma)
+% Sendo H e V inteiros, o predicado e verdadeiro se Soma for unificavel com H,
+% caso Dir seja o atomo h, ou se Soma for unificavel com V, caso contrario.
+soma_dir([V, H], Dir, Soma) :- Dir = h -> Soma = H; Soma = V.
 
+% separar_ultimo(Lst, R, El)
+% Sendo Lst e R listas, o predicado e verdadeiro se El for o ultimo elemento
+% de Lst e R for a lista obtida removendo esse ultimo elemento de Lst.
+separar_ultimo(Lst, R, El) :-
+	last(Lst, El),
+	append(R, [El], Lst).
 
-% % [ 3.1.3 ] % %
-%
-% espaco_fila(Fila, Esp, Dir)
-% Sendo Fila uma fila de um puzzle e Dir um dos atomos h ou v, o predicado e
-% verdadeiro se Esp for um espaco de Fila.
-espaco_fila(Fila, Esp, Dir) :-
-	espacos_fila(Dir, Fila, Esps),
-	member(Esp, Esps).
+% espaco_vazio(Esp)
+% Sendo Esp um espaco, o predicado e verdadeiro se a lista das posicoes de Esp
+% for unificavel com a lista vazia.
+espaco_vazio(espaco(_, [])).
 
 
 % % [ 3.1.5 ] % %
@@ -104,7 +105,21 @@ espacos_puzzle(Puzzle, Espacos) :-
 
 
 % % [ 3.1.6 ] % %
-%
+
+% espacos_com_posicoes_comuns(Espacos, Esp, EspsCom)
+% Sendo Espacos uma lista de espacos e Esp um espaco, o predicado e verdadeiro
+% se EspsCom for a lista de espacos com variaveis em comum com Esp, exceptuando
+% o proprio Esp.
+espacos_com_posicoes_comuns(Espacos, Esp, EspsCom) :-
+	include(espacos_com_posicoes_comuns_aux(Esp), Espacos, EspsCom).
+
+% espacos_com_posicoes_comuns_aux(Esp1, Esp2)
+% Sendo Esp1 e Esp2 dois espacos, o predicado e verdadeiro se esses dois espacos
+% tiverem variaveis em comum e nao forem o mesmo espaco.
+espacos_com_posicoes_comuns_aux(Esp1, Esp2) :- Esp1 == Esp2, !, false.
+espacos_com_posicoes_comuns_aux(espaco(_, Els1), espaco(_, Els2)) :-
+	\+ listas_independentes(Els1, Els2).
+
 % listas_independentes(L1, L2)
 % Sendo L1 e L2 duas listas, o predicado e verdadeiro se essas listas nao
 % tiverem elementos em comum. TODO: redo with intersection
@@ -116,29 +131,8 @@ listas_independentes([P1 | R1], [P2 | R2]) :-
 	listas_independentes([P2], R1),
 	listas_independentes(R1, R2).
 
-% espacos_com_posicoes_comuns_aux(Esp1, Esp2)
-% Sendo Esp1 e Esp2 dois espacos, o predicado e verdadeiro se esses dois espacos
-% tiverem variaveis em comum e nao forem o mesmo espaco.
-espacos_com_posicoes_comuns_aux(Esp1, Esp2) :- Esp1 == Esp2, !, false.
-espacos_com_posicoes_comuns_aux(espaco(_, Els1), espaco(_, Els2)) :-
-	\+ listas_independentes(Els1, Els2).
-
-% espacos_com_posicoes_comuns(Espacos, Esp, EspsCom)
-% Sendo Espacos uma lista de espacos e Esp um espaco, o predicado e verdadeiro
-% se EspsCom for a lista de espacos com variaveis em comum com Esp, exceptuando
-% o proprio Esp.
-espacos_com_posicoes_comuns(Espacos, Esp, EspsCom) :-
-	include(espacos_com_posicoes_comuns_aux(Esp), Espacos, EspsCom).
-
 
 % % [ 3.1.7 ] % %
-%
-% permutacoes_soma_espacos_aux(Esp, [Esp, Perms])
-% Sendo Esp um espaco, o predicado e verdadeiro quando Perms e a lista ordenada
-% de permutacoes cuja soma e igual a soma de Esp.
-permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
-	length(Els, Len),
-	permutacoes_soma(Len, [1, 2, 3, 4, 5, 6, 7, 8, 9], Soma, Perms).
 
 % permutacoes_soma_espacos(Espacos, Perms_soma)
 % Sendo Espacos uma lista de espacos, o predicado e verdadeiro se Perms_soma e
@@ -147,26 +141,15 @@ permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
 permutacoes_soma_espacos(Espacos, Perms_soma) :-
 	maplist(permutacoes_soma_espacos_aux, Espacos, Perms_soma).
 
-% % [ 3.1.8 ] % %
-% permutacoes_soma_espaco(Esp, Perms_soma, Perms)
-% Sendo Esp um espaco e Perms_soma uma lista de listas tal como obtida pelo
-% predicado permutacoes_soma_espacos, o predicado e verdadeiro se Perms for
-% a lista ordenada de permutacoes associada por Perms_soma a Esp.
-permutacoes_soma_espaco(Esp, [[EspI, Perms] | _], Perms) :- Esp == EspI, !.
-permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
-	permutacoes_soma_espaco(Esp, R, Perms).
+% permutacoes_soma_espacos_aux(Esp, [Esp, Perms])
+% Sendo Esp um espaco, o predicado e verdadeiro quando Perms e a lista ordenada
+% de permutacoes cuja soma e igual a soma de Esp.
+permutacoes_soma_espacos_aux(espaco(Soma, Els), [espaco(Soma, Els), Perms]) :-
+	length(Els, Len),
+	permutacoes_soma(Len, [1, 2, 3, 4, 5, 6, 7, 8, 9], Soma, Perms).
 
-% permutacao_possivel_espaco_aux(Perms_soma, Esp1, Perm, Esp2)
-% Sendo Esp1 e Esp2 dois espacos, Perm uma permutacao e ainda Perms_soma uma
-% lista de listas como obtida pelo predicado permutacoes_soma_espacos, o
-% predicado e verdadeiro se Perm for simultaneamente aplicavel aos elementos de
-% Esp1 como aos de Esp2.
-permutacao_possivel_espaco_aux(Perms_soma, espaco(_, Els1), Perm, Esp) :-
-	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
-	Esp = espaco(_, Els2),
-	% se usasse include, a unificacao seria preservada
-	findall(P, (member(P, Perms), Els1 = Perm, Els2 = P), Possiveis),
-	Possiveis \== [].
+
+% % [ 3.1.8 ] % %
 
 % permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma)
 % Sendo Perm uma permutacao, Esp um espaco, Espacos uma lista de espacos e ainda
@@ -180,8 +163,29 @@ permutacao_possivel_espaco(Perm, Esp, Espacos, Perms_soma) :-
 	maplist(permutacao_possivel_espaco_aux(Perms_soma, Esp, Perm), Comuns).
 
 
+% permutacao_possivel_espaco_aux(Perms_soma, Esp1, Perm, Esp2)
+% Sendo Esp1 e Esp2 dois espacos, Perm uma permutacao e ainda Perms_soma uma
+% lista de listas como obtida pelo predicado permutacoes_soma_espacos, o
+% predicado e verdadeiro se Perm for simultaneamente aplicavel aos elementos de
+% Esp1 como aos de Esp2.
+permutacao_possivel_espaco_aux(Perms_soma, espaco(_, Els1), Perm, Esp) :-
+	permutacoes_soma_espaco(Esp, Perms_soma, Perms),
+	Esp = espaco(_, Els2),
+	% se usasse include, a unificacao seria preservada
+	findall(P, (member(P, Perms), Els1 = Perm, Els2 = P), Possiveis),
+	Possiveis \== [].
+
+% permutacoes_soma_espaco(Esp, Perms_soma, Perms)
+% Sendo Esp um espaco e Perms_soma uma lista de listas tal como obtida pelo
+% predicado permutacoes_soma_espacos, o predicado e verdadeiro se Perms for
+% a lista ordenada de permutacoes associada por Perms_soma a Esp.
+permutacoes_soma_espaco(Esp, [[EspI, Perms] | _], Perms) :- Esp == EspI, !.
+permutacoes_soma_espaco(Esp, [_ | R], Perms) :-
+	permutacoes_soma_espaco(Esp, R, Perms).
+
+
 % % [ 3.1.9 ] % %
-%
+
 % permutacoes_possiveis_espaco(Espacos, Perms_soma, Esp, Perms_poss)
 % Sendo Espacos uma lista de espacos, Perms_soma uma lista de listas como obtida
 % pelo predicado permutacoes_soma_espacos e Esp um espaco, o predicado e
@@ -194,7 +198,7 @@ permutacoes_possiveis_espaco(Espacos, P_soma, Esp, [Els, Poss]) :-
 
 
 % % [ 3.1.10 ] %
-%
+
 % permutacoes_possiveis_espacos(Espacos, Perms_poss_esps)
 % Sendo Espacos uma lista de espacos, o predicado e verdadeiro se
 % Perms_poss_esps for a lista de permutacoes possiveis para esses espacos.
@@ -204,7 +208,7 @@ permutacoes_possiveis_espacos(Esps, Perms_poss_esps) :-
 
 
 % % [ 3.1.11 ] % %
-%
+
 % numeros_comuns(Lst_perms, Numeros_comuns)
 % Sendo Lst_perms uma lista de permutacoes, o predicado e verdadeiro se
 % Numeros_comuns for uma lista de pares (pos, num) e todas as listas de
@@ -221,22 +225,13 @@ numeros_comuns(Lst_perms, Nums_comuns) :-
 
 
 % % [ 3.1.12 ] % %
-%
-% aplica_atribuicao(Vars, (Pos, Num))
-% Sendo Vars uma lista, Pos uma posicao uma variavel dessa lista e Num um
-% numero, o predicado e verdadeiro se o elemento de Vars na posicao Pos for
-% unificavel com Num.
-aplica_atribuicao(Vars, (Pos, Num)) :-
-	nth1(Pos, Vars, Var),
-	Var = Num.
 
-% substitui_comuns(Vars, Nums)
-% Sendo Vars uma lista e Nums uma lista de pares (pos, num), o predicado e
-% verdadeiro se para todas as posicoes pos for possivel unificar o elemento de
-% Vars nessa posicao com num.
-substitui_comuns(_, []) :- !.
-substitui_comuns(Vars, Nums) :-
-	maplist(aplica_atribuicao(Vars), Nums).
+% atribui_comuns(Perms_possiveis)
+% Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
+% verdadeiro se essa lista for atualizavel para ser atribuido a cada espaco
+% numeros comuns a todas as permutacoes possiveis para esse espaco.
+atribui_comuns(Perms_possiveis) :-
+	maplist(atribui_comuns_aux, Perms_possiveis).
 
 % atribui_comuns_aux([Vars, Perms])
 % Sendo Vars uma lista de elementos de um espaco e Perms uma lista de
@@ -246,22 +241,24 @@ atribui_comuns_aux([Vars, Perms]) :-
 	numeros_comuns(Perms, Nums),
 	substitui_comuns(Vars, Nums).
 
-% atribui_comuns(Perms_possiveis)
-% Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
-% verdadeiro se essa lista for atualizavel para ser atribuido a cada espaco
-% numeros comuns a todas as permutacoes possiveis para esse espaco.
-atribui_comuns(Perms_possiveis) :-
-	maplist(atribui_comuns_aux, Perms_possiveis).
+% substitui_comuns(Vars, Nums)
+% Sendo Vars uma lista e Nums uma lista de pares (pos, num), o predicado e
+% verdadeiro se para todas as posicoes pos for possivel unificar o elemento de
+% Vars nessa posicao com num.
+substitui_comuns(_, []) :- !.
+substitui_comuns(Vars, Nums) :-
+	maplist(aplica_atribuicao(Vars), Nums).
+
+% aplica_atribuicao(Vars, (Pos, Num))
+% Sendo Vars uma lista, Pos uma posicao uma variavel dessa lista e Num um
+% numero, o predicado e verdadeiro se o elemento de Vars na posicao Pos for
+% unificavel com Num.
+aplica_atribuicao(Vars, (Pos, Num)) :-
+	nth1(Pos, Vars, Var),
+	Var = Num.
 
 
 % % [ 3.1.13 ] % %
-%
-% retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms])
-% Sendo Vars uma lista e Perms uma lista de permutacoes possiveis para esse
-% espaco, o predicado e verdadeiro se Novas_perms for a lista obtida excluindo
-% de Perms as permutacoes que nao sao unificaveis com Vars.
-retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms]) :-
-	exclude(\=(Vars), Perms, Novas_perms).
 
 % retira_impossiveis(Perms_possiveis, Novas_perms_possiveis)
 % Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
@@ -270,9 +267,16 @@ retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms]) :-
 retira_impossiveis(Perms_possiveis, Novas_perms_possiveis) :-
 	maplist(retira_impossiveis_aux, Perms_possiveis, Novas_perms_possiveis).
 
+% retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms])
+% Sendo Vars uma lista e Perms uma lista de permutacoes possiveis para esse
+% espaco, o predicado e verdadeiro se Novas_perms for a lista obtida excluindo
+% de Perms as permutacoes que nao sao unificaveis com Vars.
+retira_impossiveis_aux([Vars, Perms], [Vars, Novas_perms]) :-
+	exclude(\=(Vars), Perms, Novas_perms).
+
 
 % % [ 3.1.14 ] % %
-% 
+
 % simplifica(Perms_possiveis, Novas_perms_possiveis)
 % Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
 % verdadeiro se Novas_perms_possiveis for o resultado de simplificar a lista
@@ -290,7 +294,7 @@ simplifica(Perms_poss, Novas_perms_poss) :-
 
 
 % % [ 3.1.15 ] % %
-%
+
 % inicializa(Puzzle, Perms_possiveis)
 % Sendo Puzzle um puzzle, o predicado e verdadeiro se Perms_possiveis for a
 % lista de permutacoes possiveis simplificada para Puzzle.
@@ -299,16 +303,8 @@ inicializa(Puzzle, Perms_poss) :-
 	permutacoes_possiveis_espacos(Espacos, Perms_poss_esps),
 	simplifica(Perms_poss_esps, Perms_poss).
 
+
 % % [ 3.2.1 ] % %
-%
-% primeiro_com_perms_tamanho(Perms, Len, Perm)
-% Sendo Perms uma lista de permutacoes possiveis e Len um numero, o predicado e
-% verdadeiro se Perm for a primeira permutacao (incluindo variaveis do espaco)
-% em Perms com tamanho Len.
-primeiro_com_perms_tamanho([[V, P] | _], Len, [V, P]) :-
-	length(P, Len), !.
-primeiro_com_perms_tamanho([_ | R], Len, E) :-
-	primeiro_com_perms_tamanho(R, Len, E).
 
 % escolhe_menos_alternativas(Perms_possiveis, Escolha)
 % Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
@@ -322,9 +318,18 @@ escolhe_menos_alternativas(Perms_poss, [VarsEscolha, PermsEscolha]) :-
 	min_list(ProperLens, MinLen),
 	primeiro_com_perms_tamanho(Perms_poss, MinLen, [VarsEscolha, PermsEscolha]).
 
+% primeiro_com_perms_tamanho(Perms, Len, Perm)
+% Sendo Perms uma lista de permutacoes possiveis e Len um numero, o predicado e
+% verdadeiro se Perm for a primeira permutacao (incluindo variaveis do espaco)
+% em Perms com tamanho Len.
+primeiro_com_perms_tamanho([[V, P] | _], Len, [V, P]) :-
+	length(P, Len), !.
+primeiro_com_perms_tamanho([_ | R], Len, E) :-
+	primeiro_com_perms_tamanho(R, Len, E).
+
 
 % % [ 3.2.2 ] % %
-%
+
 % experimenta_perm(Escolha, Perms_possiveis, Novas_perms_possiveis)
 % Sendo Perms_possiveis uma lista de permutacoes possiveis e Escolha um dos
 % seus elementos, o predicado e verdadeiro se, para uma permutacao Perm das
@@ -340,7 +345,7 @@ experimenta_perm([Esp, Lst_perms], Perms_poss, Novas_perm_poss) :-
 
 
 % % [ 3.2.3 ] % %
-%
+
 % resolve_aux(Perms_possiveis, Novas_perms_possiveis)
 % Sendo Perms_possiveis uma lista de permutacoes possiveis, o predicado e
 % verdadeiro se Novas_perms_possiveis for a lista resultante de repetidamente
@@ -353,8 +358,9 @@ resolve_aux(Perms_poss, Novas_perms_poss) :-
 	resolve_aux(Simplificadas, Novas_perms_poss).
 resolve_aux(Perms_poss, Perms_poss).
 
+
 % % [ 3.3.1 ] % %
-%
+
 % resolve(Puzzle)
 % Sendo Puzzle um puzzle, o predicado e verdadeiro se Puzzle for unificavel
 % com a sua resolucao, ou seja, a sua grelha com todas as variaveis
